@@ -26,8 +26,9 @@ extern crate ole32;
 extern crate guid;
 
 pub mod id;
+mod folder;
 
-use id::*;
+pub use folder::Folder;
 
 use std::ptr::null_mut;
 use std::mem;
@@ -75,54 +76,6 @@ pub fn known_path(guid: &guid::GUID) -> Option<PathBuf> {
         CoTaskMemFree(mem::transmute(path));
     }
     Some(Path::new(&string).to_path_buf())
-}
-
-/// Represents a standard Windows [known folder](https://msdn.microsoft.com/en-us/library/windows/desktop/bb776911.aspx).
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
-pub enum Folder {
-    /// The [`FOLDERID_LocalAppData`](https://msdn.microsoft.com/en-us/library/windows/desktop/dd378457.aspx#folderid_localappdata)
-    /// known folder.
-    LocalAppData,
-
-    /// The [`FOLDERID_ProgramData`](https://msdn.microsoft.com/en-us/library/windows/desktop/dd378457.aspx#folderid_programdata)
-    /// known folder.
-    ProgramData,
-
-    /// The [`FOLDERID_ProgramFiles`](https://msdn.microsoft.com/en-us/library/windows/desktop/dd378457.aspx#folderid_programfiles)
-    /// known folder.
-    ProgramFiles,
-
-    /// The [`FOLDERID_ProgramFilesX64`](https://msdn.microsoft.com/en-us/library/windows/desktop/dd378457.aspx#folderid_programfilesx64)
-    /// known folder.
-    ProgramFilesX64,
-
-    /// The [`FOLDERID_ProgramFilesX86`](https://msdn.microsoft.com/en-us/library/windows/desktop/dd378457.aspx#folderid_programfilesx86)
-    /// known folder.
-    ProgramFilesX86
-}
-
-impl Folder {
-
-    /// Returns the Windows GUID associated with this known folder.
-    pub fn id(self) -> guid::GUID {
-        match self {
-            Folder::LocalAppData    => LOCAL_APP_DATA,
-            Folder::ProgramData     => PROGRAM_DATA,
-            Folder::ProgramFiles    => PROGRAM_FILES,
-            Folder::ProgramFilesX64 => PROGRAM_FILES_X64,
-            Folder::ProgramFilesX86 => PROGRAM_FILES_X86
-        }
-    }
-
-    /// Returns the path for this known folder on this system.
-    ///
-    /// This function provides the functionality of the standard Windows
-    /// [SHGetKnownFolderPath](https://msdn.microsoft.com/en-us/library/windows/desktop/bb762188.aspx)
-    /// API.
-    pub fn path(self) -> PathBuf {
-        known_path(&self.id()).expect("Folder::path")
-    }
-
 }
 
 #[cfg(test)]
